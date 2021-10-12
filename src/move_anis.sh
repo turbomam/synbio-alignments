@@ -1,0 +1,14 @@
+REMOMTE_ANI_PATH=data/iarpa/qc/pyani/*
+REPLACEMENT_PATH=data/ANI/
+
+for SAMPLES_ANI_PATH in $REMOMTE_ANI_PATH ; 
+do SAMPLES_ANI_PATH_FILE=$SAMPLES_ANI_PATH/pyani_out/ANIm_percentage_identity.tab ; 
+SAMPLE_ID=`basename $SAMPLES_ANI_PATH` ;
+REPLACEMENT_FILE=$REPLACEMENT_PATH$SAMPLE_ID.tsv ;
+if test -f "$SAMPLES_ANI_PATH_FILE"; then
+    echo "$SAMPLES_ANI_PATH_FILE exists." ;
+    cp $SAMPLES_ANI_PATH_FILE $REPLACEMENT_FILE ;
+else 
+	echo "$SAMPLES_ANI_PATH_FILE MISSING."
+fi ;
+done
