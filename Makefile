@@ -35,13 +35,20 @@ build/reference_genomes.csv: src/pick_genomes.py | build
 .PHONY: mirror_genomes
 mirror_genomes: build/reference_genomes.csv | data/reference_genomes
 	$(eval CP=$(shell tail -n +2 build/reference_genomes.csv | sed -E 's|^([0-9]+[^,]*),(.+)$$|/data/iarpa/TE/\1/reference_genome/\2.f*|g' | tr '\r\n' ' '))
-	sshpass -p ${LBL_PASSWORD} scp -v -T ${LBL_USER}@merlot.lbl.gov:"$(CP)" data/reference_genomes
+	sshpass -p ${LBL_PASSWORD} scp -r -v -T ${LBL_USER}@merlot.lbl.gov:"$(CP)" data/reference_genomes
 
 # 5. Download the target sequences to blast against the genomes
+# --recursive --copy-links
+# -avR
 .PHONY: mirror_seqs
 mirror_seqs:
-	sshpass -p ${LBL_PASSWORD} rsync -avR ${LBL_USER}@merlot.lbl.gov:/data/iarpa/TE/*/target_sequence/IF*.fasta .
+	sshpass -p ${LBL_PASSWORD} rsync --recursive --copy-links --relative ${LBL_USER}@merlot.lbl.gov:/data/iarpa/TE/*/target_sequence/IF*.fasta .
 
 # 6. BLAST! This will also take some time - add '-v' to the command to see progress
 build/alignments.csv: src/blast_seqs.py build/reference_genomes.csv
 	python3 $^ $@
+
+clean:
+	rm -rf build/*
+	rm -rf data/*
+
